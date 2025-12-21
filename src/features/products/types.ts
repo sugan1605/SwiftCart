@@ -1,8 +1,6 @@
-export type ProductDTO = {
-  id: number;
-  name: string;
-  slug: string;
-  description: string;
-  priceCents: number;
-  imageUrl: string | null;
-};
+import type { Product } from "@prisma/client";
+
+export type ProductDTO = Pick<
+  Product,
+  "id" | "name" | "slug" | "description" | "priceCents" | "imageUrl"
+>;

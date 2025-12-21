@@ -1,14 +1,45 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getProductBySlug } from "@/features/products/queries";
 import ProductCardActions from "@/components/products/ProductCardActions";
 import { CURRENCY } from "@/config/appConfig";
 
-type PageProps = {
+export async function generateMetadata({
+  params,
+}: {
   params: { slug: string };
+}): Promise<Metadata> {
+  const product = await getProductBySlug(params.slug);
+
+  if (!product) {
+    return {
+      title: "Product not found",
+      description: "This product does not exist.",
+    };
+  }
+
+  return {
+    title: `${product.name} - Next E-commerce`,
+    description: product.description,
+    openGraph: {
+      title: product.name,
+      description: product.description,
+      type: "website",
+    },
+    alternates: {
+      canonical: `/products/${product.slug}`,
+    },
+  };
+}
+
+type PageProps = {
+  params: Promise<{ slug: string }>;
 };
 
 export default async function ProductDetailsPage({ params }: PageProps) {
-  const product = await getProductBySlug(params.slug);
+    const { slug } = await params
+
+  const product = await getProductBySlug(slug);
 
   if (!product) return notFound();
 

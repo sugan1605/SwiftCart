@@ -61,3 +61,10 @@ logs
 
 # OS
 Thumbs.db
+
+
+.env.local
+.env.production
+.env.development
+*.log
+.prisma

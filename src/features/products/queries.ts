@@ -9,6 +9,7 @@ export async function getActiveProducts() {
     orderBy: { createdAt: "desc" },
   });
 
+  console.log("Active products found:", products.length);
   return products.map(toProductDTO);
 }
 
