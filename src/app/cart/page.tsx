@@ -9,6 +9,7 @@ import {
   decreaseQuantity,
 } from "@/features/cart/cartSlice";
 
+import CheckoutButton from "@/components/cart/CheckoutButton";
 import { selectCartSummary } from "@/features/cart/selectors";
 import { CURRENCY } from "@/config/appConfig";
 
@@ -132,14 +133,19 @@ export default function CartPage() {
       </div>
 
       <footer className="mt-8 flex items-center justify-between border-t border-zinc-200 pt-6 dark:border-zinc-800">
-        <div className="text-sm text-zinc-600 dark:text-zinc-400">
-          Shipping and taxes calculated at checkout (later 😄)
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-zinc-600 dark:text-zinc-400">
+            Shipping and taxes calculated at checkout (later 😄)
+          </div>
+          <div className="text-right">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">Total</p>
+            <p className="text-2xl font-bold text-black dark:text-white">
+              {cartTotal.toFixed(2)} {CURRENCY}
+            </p>
+          </div>
         </div>
-        <div className="text-right">
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">Total</p>
-          <p className="text-2xl font-bold text-black dark:text-white">
-            {cartTotal.toFixed(2)} {CURRENCY}
-          </p>
+        <div className="mt-6">
+          <CheckoutButton />
         </div>
       </footer>
     </section>
