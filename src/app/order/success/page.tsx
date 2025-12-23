@@ -1,11 +1,27 @@
 import Link from "next/link";
+import { prisma } from "@/lib/prisma";
+import { notFound } from "next/navigation";
+import { CURRENCY } from "@/config/appConfig";
 
-export default async function OrderSuccessPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ orderId?: string }>;
-}) {
+//Signaturen (leser query params)
+type PageProps = {
+  searchParams: Promise<{
+    orderId?: string
+  }>;
+};
+
+export default async function SuccessPage({ searchParams }: PageProps) {
   const { orderId } = await searchParams;
+  const id = Number.parseInt(orderId ?? "", 10);
+  if (!Number.isInteger(id) || id <= 0) return notFound();
+
+  const order = await prisma.order.findUnique({
+    where: { id }, // Int
+    include: { items: true },
+  });
+  if (!order) return notFound();
+
+  // Parse & guard:
 
   return (
     <section className="mx-auto max-w-3xl px-4 py-16">
@@ -14,25 +30,51 @@ export default async function OrderSuccessPage({
       </h1>
 
       <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-        Order ID: <span className="font-mono">{orderId ?? "unknown"}</span>
+        Order ID: <span className="font-mono">{orderId}</span>
       </p>
 
-      <div className="mt-8 flex gap-3">
-        <Link
-          href="/products"
-          className="rounded-full border px-5 py-2 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900 transition"
-        >
-          Continue shopping
-        </Link>
+      <p className="mt-1 text-zinc-600 dark:text-zinc-400">
+        Total:{" "}
+        <span className="font-mono">
+          {(order.totalCents / 100).toFixed(2)} {CURRENCY}
+        </span>
+      </p>
+      <div className="mt-8 rounded-2xl border bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+        <h2 className="text-lg font-semibold text-black dark:text-white">
+          Items
+        </h2>
+        <ul className="mt-3 space-y-3">
+          {order.items.map((item) => (
+            <li
+              key={item.id}
+              className="flex items-center justify-between gap-4 rounded-xl border px-4 py-3 dark:border-zinc-800"
+            >
+              <div>
+                <p className="font-medium text-black dark:text-white">
+                  {item.name}
+                </p>
+              </div>
 
-        {orderId && (
-          <Link
-            href={`/order/${orderId}`}
-            className="rounded-full bg-black px-5 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 transition"
-          >
-            View order
-          </Link>
-        )}
+              <div className="text-right">
+                <p className="font-medium text-black dark:text-white">
+                  {item.name}
+                </p>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                  Qty: {item.quantity}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="font-mono text-black dark:text-white">
+                  {(item.priceCents / 100).toFixed(2)} {CURRENCY}
+                </p>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                  Line: {((item.priceCents * item.quantity) / 100).toFixed(2)}{" "}
+                  {CURRENCY}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );
