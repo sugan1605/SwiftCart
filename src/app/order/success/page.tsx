@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import { CURRENCY } from "@/config/appConfig";
+import { formatNOKFromCents } from "@/lib/utils/money";
 
 //Signaturen (leser query params)
 type PageProps = {
   searchParams: Promise<{
-    orderId?: string
+    orderId?: string;
   }>;
 };
 
@@ -36,7 +36,7 @@ export default async function SuccessPage({ searchParams }: PageProps) {
       <p className="mt-1 text-zinc-600 dark:text-zinc-400">
         Total:{" "}
         <span className="font-mono">
-          {(order.totalCents / 100).toFixed(2)} {CURRENCY}
+          {formatNOKFromCents(order.totalCents)}
         </span>
       </p>
       <div className="mt-8 rounded-2xl border bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
@@ -65,11 +65,10 @@ export default async function SuccessPage({ searchParams }: PageProps) {
               </div>
               <div className="text-right">
                 <p className="font-mono text-black dark:text-white">
-                  {(item.priceCents / 100).toFixed(2)} {CURRENCY}
+                  {formatNOKFromCents(item.priceCents)}
                 </p>
                 <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                  Line: {((item.priceCents * item.quantity) / 100).toFixed(2)}{" "}
-                  {CURRENCY}
+                  Line: {formatNOKFromCents(item.priceCents * item.quantity)}
                 </p>
               </div>
             </li>

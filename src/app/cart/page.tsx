@@ -11,7 +11,7 @@ import {
 
 import CheckoutButton from "@/components/cart/CheckoutButton";
 import { selectCartSummary } from "@/features/cart/selectors";
-import { CURRENCY } from "@/config/appConfig";
+import { formatNOKFromCents } from "@/lib/utils/money";
 
 export default function CartPage() {
   const dispatch = useAppDispatch();
@@ -89,7 +89,7 @@ export default function CartPage() {
                   {item.name}
                 </h2>
                 <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                  Price: {item.priceCents.toFixed(2)} {CURRENCY}
+                  Price: {formatNOKFromCents(item.priceCents)}
                 </p>
                 <div className="mt-2 flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
                   <span>Qty:</span>
@@ -117,7 +117,7 @@ export default function CartPage() {
 
               <div className="flex flex-col items-end gap-2">
                 <span className="text-base font-semibold text-black dark:text-white">
-                  {lineTotal.toFixed(2)} NOK
+                  {formatNOKFromCents(lineTotal)}
                 </span>
                 <button
                   type="button"
@@ -140,7 +140,7 @@ export default function CartPage() {
           <div className="text-right">
             <p className="text-sm text-zinc-600 dark:text-zinc-400">Total</p>
             <p className="text-2xl font-bold text-black dark:text-white">
-              {cartTotal.toFixed(2)} {CURRENCY}
+              {formatNOKFromCents(cartTotal)}
             </p>
           </div>
         </div>

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useAppSelector } from "@/lib/redux/hooks";
 import { selectCartSummary } from "@/features/cart/selectors";
 import { APP_NAME, CURRENCY } from "@/config/appConfig";
+import { formatNOKFromCents } from "@/lib/utils/money";
 
 export default function Header() {
   // Hent alle items fra handlekurven
@@ -12,8 +13,7 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
 
   // Read cart data from Redux via selector
-  const { items, totalItems, cartTotal } =
-    useAppSelector(selectCartSummary);
+  const { items, totalItems, cartTotal } = useAppSelector(selectCartSummary);
 
   // Show max 3 items in the mini-cart preview
   const previewItems = items.slice(0, 3);
@@ -52,12 +52,7 @@ export default function Header() {
               className="hover:text-black dark:hover:text-white"
             >
               Cart ({totalItems})
-              {totalItems > 0 && (
-                <>
-                  {" "}
-                  · {cartTotal.toFixed(2)} {CURRENCY}
-                </>
-              )}
+              {totalItems > 0 && <> · {formatNOKFromCents(cartTotal)}</>}
             </button>
 
             {/* Mini-cart dropdown (click-based, no hover) */}
@@ -82,7 +77,7 @@ export default function Header() {
                         </p>
                       </div>
                       <span className="font-medium text-black dark:text-white">
-                        {(item.priceCents * item.quantity).toFixed(2)} {CURRENCY}
+                        {formatNOKFromCents(item.priceCents * item.quantity)}{" "}
                       </span>
                     </div>
                   ))}
@@ -101,7 +96,7 @@ export default function Header() {
                       Total
                     </span>
                     <span className="font-semibold text-black dark:text-white">
-                      {cartTotal.toFixed(2)} {CURRENCY}
+                      {formatNOKFromCents(cartTotal)}
                     </span>
                   </div>
 

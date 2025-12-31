@@ -25,6 +25,7 @@ async function main() {
         priceCents: 179900,
       },
     ],
+    skipDuplicates: true,
   });
 
   console.log("Seed completed!");

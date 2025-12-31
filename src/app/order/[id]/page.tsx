@@ -1,11 +1,10 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { CURRENCY } from "@/config/appConfig";
+import { formatNOKFromCents } from "@/lib/utils/money";
 
 type PageProps = {
   params: Promise<{ id: string }>;
 };
-
 
 //Se ordre
 
@@ -48,7 +47,7 @@ export default async function OrderPage({ params }: PageProps) {
             </div>
 
             <p className="font-semibold text-black dark:text-white">
-              {((item.priceCents * item.quantity) / 100).toFixed(2)} {CURRENCY}
+              {formatNOKFromCents(item.priceCents * item.quantity)}
             </p>
           </div>
         ))}
@@ -57,7 +56,7 @@ export default async function OrderPage({ params }: PageProps) {
       <div className="mt-8 border-t border-zinc-200 pt-6 text-right dark:border-zinc-800">
         <p className="text-sm text-zinc-600 dark:text-zinc-400">Total</p>
         <p className="text-2xl font-bold text-black dark:text-white">
-          {(order.totalCents / 100).toFixed(2)} {CURRENCY}
+          {formatNOKFromCents(order.totalCents)}
         </p>
       </div>
     </section>

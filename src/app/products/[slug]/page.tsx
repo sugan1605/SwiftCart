@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getProductBySlug } from "@/features/products/queries";
 import ProductCardActions from "@/components/products/ProductCardActions";
-import { CURRENCY } from "@/config/appConfig";
+import { formatNOKFromCents } from "@/lib/utils/money";
 
 export async function generateMetadata({
   params,
@@ -37,7 +37,7 @@ type PageProps = {
 };
 
 export default async function ProductDetailsPage({ params }: PageProps) {
-    const { slug } = await params
+  const { slug } = await params;
 
   const product = await getProductBySlug(slug);
 
@@ -60,7 +60,7 @@ export default async function ProductDetailsPage({ params }: PageProps) {
           </p>
 
           <p className="mt-6 text-2xl font-semibold text-black dark:text-white">
-            {(product.priceCents / 100).toFixed(2)} {CURRENCY}
+            {formatNOKFromCents(product.priceCents)}
           </p>
 
           <div className="mt-6">

@@ -6,7 +6,7 @@
 import Link from "next/link";
 import { useAppDispatch } from "@/lib/redux/hooks";
 import { addItem } from "@/features/cart/cartSlice";
-import { CURRENCY } from "@/config/appConfig";
+import { formatNOKFromCents } from "@/lib/utils/money";
 
 type ProductCardProps = {
   id: number;
@@ -40,7 +40,7 @@ export default function ProductCard({
       <div className="mb-3 h-40 w-full rounded-lg bg-zinc-100 dark:bg-zinc-900" />
 
       {/*Link til product detail page */}
-      
+
       <Link href={`/products/${slug}`} className="hover:underline">
         <h2 className="text-lg font-semibold text-black dark:text-white">
           {name}
@@ -52,7 +52,7 @@ export default function ProductCard({
       </p>
       <div className="mt-3 flex items-center justify-between">
         <span className="text-base font-medium text-black dark:text-white">
-          {priceCents.toFixed(2)} {CURRENCY}
+          {formatNOKFromCents(priceCents)}
         </span>
       </div>
       <button
