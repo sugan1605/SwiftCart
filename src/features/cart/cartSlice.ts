@@ -1,57 +1,128 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
+/**
+ * Redux item (brukes i UI / mini-cart)
+ * id = Shopify lineId (stabil)
+ */
 export type CartItem = {
-  id: number;
+  id: string;
+  variantId: string | null;
   name: string;
   priceCents: number;
   quantity: number;
 };
 
+/**
+ * Rå Shopify cart (source of truth)
+ * Brukes av selectors (count / totals)
+ */
+export type ShopifyCart = {
+  totalQuantity?: number;
+  cost?: {
+    totalAmount?: {
+      amount: string;
+      currencyCode: string;
+    };
+  };
+  lines?: {
+    nodes: Array<{
+      id: string; // lineId
+      quantity: number;
+      cost?: {
+        amountPerQuantity?: {
+          amount: string;
+          currencyCode: string;
+        };
+      };
+      merchandise?: {
+        id?: string; // variantId
+        title?: string;
+        product?: {
+          title?: string;
+        };
+      };
+    }>;
+  };
+};
+
+/**
+ * Redux cart state
+ */
 type CartState = {
-  items: CartItem[];
+  items: CartItem[];              // UI / mini-cart
+  shopifyCart: ShopifyCart | null; // Shopify snapshot
 };
 
 const initialState: CartState = {
   items: [],
+  shopifyCart: null,
 };
 
 const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
+    /**
+     * Kun for lokal testing / fallback
+     * Shopify-flow bruker setCartFromShopify
+     */
     addItem(state, action: PayloadAction<CartItem>) {
-      const existingItem = state.items.find(
-        (item) => item.id === action.payload.id
-      );
-
-      if (existingItem) {
-        existingItem.quantity += action.payload.quantity;
+      const existing = state.items.find((i) => i.id === action.payload.id);
+      if (existing) {
+        existing.quantity += action.payload.quantity;
       } else {
         state.items.push(action.payload);
       }
     },
-    removeItem(state, action: PayloadAction<number>) {
-      state.items = state.items.filter((item) => item.id !== action.payload);
+
+    removeItem(state, action: PayloadAction<string>) {
+      state.items = state.items.filter((i) => i.id !== action.payload);
     },
+
     clearCart(state) {
       state.items = [];
+      state.shopifyCart = null;
     },
-    // Finn riktig item basert på id
-    increaseQuantity(state, action: PayloadAction<number>) {
-      const item = state.items.find((i) => i.id === action.payload);
-      if (item) {
-        item.quantity += 1;
-      }
-    },
-    decreaseQuantity(state, action: PayloadAction<number>) {
-      const item = state.items.find((i) => i.id === action.payload);
-      if (!item) return;
 
-      if (item.quantity > 1) {
-        item.quantity -= 1;
-      } else {
-        state.items = state.items.filter((i) => i.id !== action.payload);
+    /**
+     * Source of truth:
+     * Mapper Shopify cart -> Redux
+     */
+    setCartFromShopify(
+      state,
+      action: PayloadAction<ShopifyCart | null>
+    ) {
+      const cart = action.payload;
+
+      // Lagre rå Shopify cart (for selectors)
+      state.shopifyCart = cart;
+
+      // Ingen cart / tom cart
+      if (!cart?.lines?.nodes?.length) {
+        state.items = [];
+        return;
       }
+
+      // Map Shopify lines -> Redux items
+      state.items = cart.lines.nodes.map((line) => {
+        const name =
+          line.merchandise?.product?.title ??
+          line.merchandise?.title ??
+          "Item";
+
+        const amount =
+          line.cost?.amountPerQuantity?.amount ?? "0";
+
+        const priceCents = Math.round(Number(amount) * 100);
+
+        return {
+          id: line.id, // lineId = stabil
+          variantId: line.merchandise?.id ?? null,
+          name,
+          quantity: line.quantity ?? 1,
+          priceCents,
+        };
+      });
     },
   },
 });
@@ -60,8 +131,7 @@ export const {
   addItem,
   removeItem,
   clearCart,
-  increaseQuantity,
-  decreaseQuantity,
+  setCartFromShopify,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

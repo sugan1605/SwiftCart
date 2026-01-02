@@ -1,14 +1,22 @@
-export default function Home() {
+import { storefrontFetch } from "@/lib/shopify/storefront";
+import { PRODUCTS_QUERY } from "@/lib/shopify/queries";
+
+type ProductsQuery = {
+  shop: { name: string };
+  products: { nodes: { id: string; title: string; handle: string }[] };
+};
+
+export default async function Page() {
+  const data = await storefrontFetch<ProductsQuery>(PRODUCTS_QUERY, { first: 20 });
+
   return (
-    <main className="flex min-h-screen items-center justify-center bg-white dark:bg-black">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold text-black dark:text-white">
-          Next E-Commerce
-        </h1>
-        <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400">
-          Your modern store built with Next.js, TypeScript, Redux Toolkit & Prisma.
-        </p>
-      </div>
+    <main>
+      <h1>{data.shop.name}</h1>
+      <ul>
+        {data.products.nodes.map((p) => (
+          <li key={p.id}>{p.title}</li>
+        ))}
+      </ul>
     </main>
   );
 }

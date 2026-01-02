@@ -1,2 +1,2 @@
-export const APP_NAME = "Next E-Commerce";
+export const APP_NAME = "SwiftCart";
 export const CURRENCY = "NOK";

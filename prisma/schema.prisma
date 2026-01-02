@@ -39,7 +39,16 @@ model Order {
   status    OrderStatus @default(PENDING)
   items OrderItem[]
 
-  totalCents Int
+  currency String?
+  subtotalCents Int?
+  totalCents Int?
+
+
+  // Shopify linkage
+
+shopifyOrderId String? @unique
+shopifyOrderName String?
+shopifyCheckoutUrl String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -54,6 +63,9 @@ model OrderItem {
 
   productId Int
   product Product @relation(fields: [productId], references: [id])
+
+  // Shopify linkage 
+  shopifyVariantId String?
 
   name    String
   slug    String
@@ -72,6 +84,7 @@ enum OrderStatus {
   PENDING
   PAID
   CANCELLED
+  ABANDONED
 }
 
 // Hvorfor dette er smart: OrderItem - lagrer snapshot (name/price/slug) så ordren din ikke "endres" hvis produktet endres senere.

@@ -5,13 +5,14 @@ import { formatNOKFromCents } from "@/lib/utils/money";
 
 //Signaturen (leser query params)
 type PageProps = {
-  searchParams: Promise<{
+  searchParams: {
     orderId?: string;
-  }>;
+  };
 };
 
+
 export default async function SuccessPage({ searchParams }: PageProps) {
-  const { orderId } = await searchParams;
+  const { orderId } = searchParams;
   const id = Number.parseInt(orderId ?? "", 10);
   if (!Number.isInteger(id) || id <= 0) return notFound();
 
@@ -36,7 +37,7 @@ export default async function SuccessPage({ searchParams }: PageProps) {
       <p className="mt-1 text-zinc-600 dark:text-zinc-400">
         Total:{" "}
         <span className="font-mono">
-          {formatNOKFromCents(order.totalCents)}
+          {formatNOKFromCents(order.totalCents ?? 0)}
         </span>
       </p>
       <div className="mt-8 rounded-2xl border bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">

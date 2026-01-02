@@ -62,9 +62,6 @@ logs
 # OS
 Thumbs.db
 
+# Environment variables
+.env*
 
-.env.local
-.env.production
-.env.development
-*.log
-.prisma
